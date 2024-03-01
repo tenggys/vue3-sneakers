@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive, watch } from 'vue';
+import { onMounted, ref, reactive, watch, provide } from 'vue';
 import axios from 'axios'
 
 import CardList from './components/CardList.vue';
@@ -7,6 +7,7 @@ import CardList from './components/CardList.vue';
 import HeaderComp from './components/HeaderComp.vue';
 
 const items = ref([]);
+
 
 const filters = reactive({
   sortBy: 'title',
@@ -22,11 +23,40 @@ const onchangeSearchInput = event => {
   filters.searchQuery = event.target.value;
 };
 
+const fetchFavorites = async () => {
+  try {
+
+    const {data: favorites} = await axios.get(`https://d9d60d18be01acdb.mokky.dev/favorites`)
+
+    items.value = items.value.map((item) => {
+      const favorite = favorites.find((favorite) => favorite.parentID === item.id);
+
+      if (!favorite) {
+        return item;
+      }
+ 
+      return {
+        ...item,
+        isFavorite: true,
+        favoriteId: favorite.id,
+      }
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const addToFavorite = async (item) => {
+
+item.isFavorite = !item.isFavorite
+
+}
+
 const feactItems = async () => {
   try {
     const params = {
       sortBy: filters.sortBy,
-      //searchQuery: filters.searchQuery
     };
 
     if (filters.searchQuery) {
@@ -35,16 +65,25 @@ const feactItems = async () => {
 
     const {data} = await axios.get(`https://d9d60d18be01acdb.mokky.dev/items`, { params })
 
-    items.value = data;
+    items.value = data.map(obj => ({
+      ...obj,
+      isFavorite: false,
+      isAdded: false
+    }));
 
   } catch (error) {
     console.log(error);
   }
 }
 
-onMounted(feactItems);
+onMounted(async () => {
+  await feactItems();
+  await fetchFavorites();
+});
 
-watch(filters, feactItems)
+watch(filters, feactItems);
+
+provide('addToFavorite', addToFavorite);
 
 
 

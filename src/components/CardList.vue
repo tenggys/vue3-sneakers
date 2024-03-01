@@ -1,4 +1,6 @@
 <script setup>
+
+    import {inject} from 'vue'
     import CardComp from './CardComp.vue';
 
     defineProps({
@@ -8,6 +10,9 @@
     const onClickAdd = () => {
         alert('Товар добавлен')
     }
+
+    const addToFavorite = inject('addToFavorite');
+
 </script>
 
 <template>
@@ -15,10 +20,13 @@
         <CardComp 
             v-for="item in items"
             :key="item.id"
+            :id="item.id"
             :title="item.title" 
             :imageUrl="item.imageUrl" 
             :price="item.price" 
             :onClickAdd="onClickAdd"
+            :onClickFavorite="() => addToFavorite(item)"
+            :isFavorite="item.isFavorite"
         />
       </div>
 </template>
