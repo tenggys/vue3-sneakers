@@ -1,6 +1,10 @@
 <script setup>
     import CardComp from './CardComp.vue';
 
+    defineProps({
+        items: Array
+    })
+
     const onClickAdd = () => {
         alert('Товар добавлен')
     }
@@ -8,10 +12,12 @@
 
 <template>
     <div class="grid grid-cols-4 gap-5">
-        <CardComp title="Мужские кросовки Nike Blaze Mid Suede" 
-            imageUrl="/sneakers/sneakers-1.jpg" 
-            :price="15000"
-            :isFavorite="false"
+        <CardComp 
+            v-for="item in items"
+            :key="item.id"
+            :title="item.title" 
+            :imageUrl="item.imageUrl" 
+            :price="item.price" 
             :onClickAdd="onClickAdd"
         />
       </div>
