@@ -150,8 +150,16 @@ const feactItems = async () => {
 }
 
 onMounted(async () => {
+  //const localCart = localStorage.getItem('cart');
+  //cart.value = localCart ? JSON.parse(localCart) : [];
+
   await feactItems();
   await fetchFavorites();
+
+  //items.value = items.value.map((item) => ({
+  //  ...item,
+  //  isAdded: cart.value.some((cartItem) => cartItem.id === item.id)
+  //}))
 });
 
 watch(filters, feactItems);
@@ -162,6 +170,14 @@ watch(cart, () => {
     isAdded: false
   }))
 });
+
+watch(
+  cart, 
+  () => {
+    localStorage.setItem('cart', JSON.stringify(cart.value))
+  },
+  { deep: true }
+)
 
 provide('cart', {
   cart,
